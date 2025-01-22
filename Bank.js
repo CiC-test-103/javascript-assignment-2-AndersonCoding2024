@@ -20,17 +20,18 @@ class Account {
         this.name = name; // Account holder's name
         this.balance = balance; // Initial balance (default is 0)
         this.transactionHistory = []; // Keeps a record of all transactions
-        this.recordTransaction('Account Created', balance);
+    
     }
 
 // Record a transaction
 recordTransaction(type, amount, relatedAccount = null){
-    const transaction = {
-        transactionType: type,
-        amount,
-        relatedAccount,
-        date: new Date().toLocaleString()
-    };
+    let transaction = {transactionType: type, amount};
+    if (type === 'Transfer'){
+        transaction.to = relatedAccount;
+    } else if (type === 'Received') {
+        transaction.from = relatedAccount;
+    }
+
     this.transactionHistory.push(transaction);
 }
 
@@ -42,7 +43,7 @@ deposit(amount){
     }
     this.balance += amount;
     this.recordTransaction('Deposit', amount);
-    console.log(`Deposited $${amount}. New balance: $${this.balance} `);
+  
 }
 
 // Withdraw money from the account
@@ -57,7 +58,7 @@ withdraw(amount) {
     }
     this.balance -= amount;
     this.recordTransaction('Withdrawal', amount);
-    console.log(`Withdrew $${amount}. New balance: $${this.balance}`);
+    
 }
     
 // Transfer money to another account:
@@ -76,12 +77,11 @@ transfer(amount, recipientAccount) {
     //Record the transaction for both acounts
     this.recordTransaction('Transfer', amount, recipientAccount.name);
     recipientAccount.recordTransaction('Received', amount, this.name);
-    console.log(`Transferred $${amount} to ${recipientAccount.name}. Your new balance: $${this.balance}`);
+ 
 }
 
 // Check the account balance
 checkBalance() {
-    console.log(`${this.name}'s balance: $${this.balance}`);
     return this.balance;
     }
 
