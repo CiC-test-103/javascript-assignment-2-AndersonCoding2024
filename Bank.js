@@ -7,7 +7,11 @@ class Bank {
 
     // Add methods here:
     // Example: createAccount(name, initialDeposit)
-
+    createAccount(name, initialDeposit = 0){
+        const account = new Account(name, initialDeposit);
+        this.accounts.push(account);
+        return account;
+    }
 }
 
 // Account Class: Represents a single user's account
@@ -16,7 +20,71 @@ class Account {
         this.name = name; // Account holder's name
         this.balance = balance; // Initial balance (default is 0)
         this.transactionHistory = []; // Keeps a record of all transactions
+        this.recordTransaction('Account Created', balance);
     }
+
+// Record a transaction
+recordTransaction(type, amount, relatedAccount = null){
+    const transaction = {
+        transactionType: type,
+        amount,
+        relatedAccount,
+        date: new Date().toLocaleString()
+    };
+    this.transactionHistory.push(transaction);
+}
+
+// Deppsit money into the account
+deposit(amount){
+    if (amount <= 0) {
+        console.log('Deposit amount must be greater than zero.');
+        return;
+    }
+    this.balance += amount;
+    this.recordTransaction('Deposit', amount);
+    console.log(`Deposited $${amount}. New balance: $${this.balance} `);
+}
+
+// Withdraw money from the account
+withdraw(amount) {
+    if (amount <=0){
+        console.log('Withdrawal amount must be greater than zero.');
+        return;
+    }
+    if (amount > this.balance){
+        console.log('Insufficient balance for withdrawal.');
+        return;
+    }
+    this.balance -= amount;
+    this.recordTransaction('Withdrawal', amount);
+    console.log(`Withdrew $${amount}. New balance: $${this.balance}`);
+}
+    
+// Transfer money to another account:
+transfer(amount, recipientAccount) {
+    if (amount <= 0) {
+        console.log ('Transfer amount must be greater than zero.');
+        return;
+    }
+    if (amount > this.balance) {
+        console.log('Insufficient balance for transfer.');
+        return;
+    }
+    this.balance -= amount;
+    recipientAccount.balance += amount;
+
+    //Record the transaction for both acounts
+    this.recordTransaction('Transfer', amount, recipientAccount.name);
+    recipientAccount.recordTransaction('Received', amount, this.name);
+    console.log(`Transferred $${amount} to ${recipientAccount.name}. Your new balance: $${this.balance}`);
+}
+
+// Check the account balance
+checkBalance() {
+    console.log(`${this.name}'s balance: $${this.balance}`);
+    return this.balance;
+    }
+
 
     // Add methods here:
     // Example: deposit(amount) 
